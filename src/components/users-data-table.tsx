@@ -1,7 +1,6 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,12 +54,10 @@ export function UsersDataTable({ users, currentUser }: UsersDataTableProps) {
   };
 
   const canChangeRole = (targetUser: User) => {
-    // Super admin can change anyone's role
     if (currentUser.role === UserRole.SUPERADMIN && targetUser.id !== currentUser.id) {
       return true;
     }
 
-    // Admin can only promote users to admin
     if (currentUser.role === UserRole.ADMIN && targetUser.role === UserRole.USER) {
       return true;
     }
@@ -129,25 +126,30 @@ export function UsersDataTable({ users, currentUser }: UsersDataTableProps) {
   };
 
   return (
-    <div className="rounded-md border">
+    <div className="overflow-hidden rounded-xl border-2 border-gray-200 bg-gradient-to-br from-white to-gray-50 shadow-xl">
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Contact</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Joined</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+          <TableRow className="border-b-2 border-gray-200 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 hover:from-indigo-100 hover:via-purple-100 hover:to-pink-100">
+            <TableHead className="text-base font-bold text-gray-800">Name</TableHead>
+            <TableHead className="text-base font-bold text-gray-800">Email</TableHead>
+            <TableHead className="text-base font-bold text-gray-800">Contact</TableHead>
+            <TableHead className="text-base font-bold text-gray-800">Role</TableHead>
+            <TableHead className="text-base font-bold text-gray-800">Status</TableHead>
+            <TableHead className="text-base font-bold text-gray-800">Joined</TableHead>
+            <TableHead className="text-right text-base font-bold text-gray-800">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell className="font-medium">{user.name}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.contactNumber || '—'}</TableCell>
+          {users.map((user, index) => (
+            <TableRow
+              key={user.id}
+              className={`border-b border-gray-100 transition-all duration-200 hover:scale-[1.01] hover:bg-gradient-to-r hover:from-blue-50 hover:via-indigo-50 hover:to-purple-50 hover:shadow-md ${
+                index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'
+              }`}
+            >
+              <TableCell className="font-bold text-gray-900">{user.name}</TableCell>
+              <TableCell className="text-gray-600">{user.email}</TableCell>
+              <TableCell className="text-gray-600">{user.contactNumber || '—'}</TableCell>
               <TableCell>
                 {canChangeRole(user) ? (
                   <Select
@@ -155,14 +157,18 @@ export function UsersDataTable({ users, currentUser }: UsersDataTableProps) {
                     onValueChange={(value) => handleRoleChange(user.id, value as UserRole)}
                     disabled={isChangingRole === user.id}
                   >
-                    <SelectTrigger className="w-[140px]">
+                    <SelectTrigger className="w-[140px] cursor-pointer border-2 border-indigo-200 bg-gradient-to-r from-white to-indigo-50 font-semibold shadow-sm transition-all duration-200 hover:border-indigo-400 hover:shadow-md">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="border-2 border-indigo-200 shadow-xl">
                       {getAvailableRoles(user).map((role) => (
-                        <SelectItem key={role} value={role}>
+                        <SelectItem
+                          key={role}
+                          value={role}
+                          className="cursor-pointer font-semibold transition-colors hover:bg-indigo-100"
+                        >
                           <div className="flex items-center gap-2">
-                            <Shield className="h-3 w-3" />
+                            <Shield className="h-4 w-4 text-indigo-600" />
                             <span className="capitalize">{role}</span>
                           </div>
                         </SelectItem>
@@ -170,7 +176,10 @@ export function UsersDataTable({ users, currentUser }: UsersDataTableProps) {
                     </SelectContent>
                   </Select>
                 ) : (
-                  <Badge variant={getRoleBadgeVariant(user.role)}>
+                  <Badge
+                    variant={getRoleBadgeVariant(user.role)}
+                    className="cursor-default px-3 py-1 text-sm font-bold shadow-sm"
+                  >
                     {user.role}
                     {user.id === currentUser.id && ' (You)'}
                   </Badge>
@@ -178,40 +187,66 @@ export function UsersDataTable({ users, currentUser }: UsersDataTableProps) {
               </TableCell>
               <TableCell>
                 {user.isVerified ? (
-                  <div className="flex items-center gap-1 text-green-600">
+                  <div className="flex items-center gap-2 rounded-full bg-green-100 px-3 py-1.5 text-green-700 shadow-sm">
                     <CheckCircle className="h-4 w-4" />
-                    <span className="text-sm">Verified</span>
+                    <span className="text-sm font-bold">Verified</span>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-1 text-gray-400">
+                  <div className="flex items-center gap-2 rounded-full bg-red-100 px-3 py-1.5 text-red-600 shadow-sm">
                     <XCircle className="h-4 w-4" />
-                    <span className="text-sm">Unverified</span>
+                    <span className="text-sm font-bold">Unverified</span>
                   </div>
                 )}
               </TableCell>
-              <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+              <TableCell className="font-semibold text-gray-700">
+                {new Date(user.createdAt).toLocaleDateString()}
+              </TableCell>
               <TableCell className="text-right">
-                {user.id !== currentUser.id && currentUser.role === UserRole.SUPERADMIN && (
-                  <DropdownMenu>
+                {user.id !== currentUser.id &&
+                (currentUser.role === UserRole.ADMIN ||
+                  currentUser.role === UserRole.SUPERADMIN) ? (
+                  <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => handleDeleteUser(user.id)}
-                        className="text-red-600 focus:text-red-600"
-                        disabled={isDeletingUser === user.id}
+                      <button
+                        type="button"
+                        onClick={() => console.log('Button clicked for user:', user.id)}
+                        className="relative z-10 inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-xl border-2 border-indigo-300 bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg transition-all duration-200 hover:scale-110 hover:border-indigo-500 hover:shadow-xl hover:shadow-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                       >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        {isDeletingUser === user.id ? 'Deleting...' : 'Delete User'}
-                      </DropdownMenuItem>
+                        <MoreHorizontal className="h-6 w-6 text-white" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="z-[9999] w-56 rounded-lg border-2 border-indigo-200 bg-white shadow-2xl"
+                      sideOffset={8}
+                    >
+                      <DropdownMenuLabel className="px-3 py-2 text-base font-bold text-gray-800">
+                        User Actions
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator className="bg-indigo-200" />
+                      <div className="p-1">
+                        {currentUser.role === UserRole.SUPERADMIN && (
+                          <DropdownMenuItem
+                            onClick={() => handleDeleteUser(user.id)}
+                            disabled={isDeletingUser === user.id}
+                            className="cursor-pointer rounded-md px-3 py-2.5 font-semibold text-red-600 transition-colors hover:bg-red-50 focus:bg-red-100 focus:text-red-700"
+                          >
+                            <Trash2 className="mr-2 h-5 w-5" />
+                            <span className="text-base">
+                              {isDeletingUser === user.id ? 'Deleting...' : 'Delete User'}
+                            </span>
+                          </DropdownMenuItem>
+                        )}
+                        {currentUser.role === UserRole.ADMIN && (
+                          <div className="px-3 py-2 text-sm text-gray-500">
+                            Only superadmins can delete users
+                          </div>
+                        )}
+                      </div>
                     </DropdownMenuContent>
                   </DropdownMenu>
+                ) : (
+                  <div className="text-sm text-gray-400">—</div>
                 )}
               </TableCell>
             </TableRow>

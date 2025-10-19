@@ -24,7 +24,6 @@ export function SignupForm() {
           description: result.message || 'Account created! Please verify your email.',
         });
 
-        // Navigate to verify-otp with URL params instead of sessionStorage
         if (result.userId && result.email) {
           const params = new URLSearchParams({
             userId: result.userId,
@@ -82,7 +81,9 @@ export function SignupForm() {
         <p className="text-xs text-gray-500">At least 6 characters</p>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="contactNumber">Contact Number</Label>
+        <Label htmlFor="contactNumber" className="text-sm font-bold text-gray-700">
+          Contact Number
+        </Label>
         <Input
           id="contactNumber"
           name="contactNumber"
@@ -92,14 +93,18 @@ export function SignupForm() {
           disabled={isPending}
         />
       </div>
-      <Button type="submit" className="w-full" disabled={isPending}>
+      <Button
+        type="submit"
+        className="h-12 w-full cursor-pointer bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 text-base font-bold shadow-lg shadow-indigo-500/50 transition-all duration-200 hover:scale-[1.02] hover:shadow-xl hover:shadow-indigo-500/60"
+        disabled={isPending}
+      >
         {isPending ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
             Creating account...
           </>
         ) : (
-          'Sign up'
+          'Create Account →'
         )}
       </Button>
     </form>

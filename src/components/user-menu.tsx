@@ -54,35 +54,45 @@ export function UserMenu({ user }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar>
-            <AvatarFallback className="bg-primary text-primary-foreground">
+        <Button
+          variant="ghost"
+          className="relative h-12 w-12 rounded-full border-2 border-indigo-200 bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg transition-all duration-200 hover:scale-110 hover:border-indigo-400 hover:shadow-xl"
+        >
+          <Avatar className="h-11 w-11">
+            <AvatarFallback className="bg-gradient-to-br from-white to-indigo-100 text-lg font-extrabold text-indigo-700">
               {initials}
             </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.name}</p>
-            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+      <DropdownMenuContent
+        className="w-64 border-2 border-indigo-200 bg-gradient-to-br from-white to-indigo-50/50 shadow-2xl"
+        align="end"
+        forceMount
+      >
+        <DropdownMenuLabel className="pb-3 font-normal">
+          <div className="flex flex-col space-y-2">
+            <p className="text-base font-bold leading-none text-gray-800">{user.name}</p>
+            <p className="text-sm font-medium leading-none text-gray-600">{user.email}</p>
             <div className="pt-1">
               <Badge
                 variant={getRoleBadgeVariant(user.role)}
-                className="flex w-fit items-center gap-1"
+                className="flex w-fit items-center gap-1.5 px-3 py-1 text-sm font-bold shadow-sm"
               >
-                <RoleIcon className="h-3 w-3" />
+                <RoleIcon className="h-4 w-4" />
                 {user.role}
               </Badge>
             </div>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="bg-indigo-200" />
         <DropdownMenuItem asChild>
           <form action={logoutAction}>
-            <button type="submit" className="flex w-full items-center">
-              <LogOut className="mr-2 h-4 w-4" />
+            <button
+              type="submit"
+              className="flex w-full cursor-pointer items-center rounded-md px-2 py-2 text-sm font-bold text-red-600 transition-colors hover:bg-red-50"
+            >
+              <LogOut className="mr-2 h-5 w-5" />
               <span>Log out</span>
             </button>
           </form>

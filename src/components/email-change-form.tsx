@@ -56,7 +56,6 @@ export function EmailChangeForm({ currentEmail }: EmailChangeFormProps) {
         setStep('request');
         setNewEmail('');
 
-        // Reload page to show updated email
         window.location.reload();
       } else {
         toast({

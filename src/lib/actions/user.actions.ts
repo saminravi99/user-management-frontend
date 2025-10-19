@@ -10,8 +10,6 @@ import {
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
-// For server-side actions, use INTERNAL_API_URL (Docker network) if available
-// Otherwise fall back to NEXT_PUBLIC_API_URL
 const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 async function getAuthHeaders() {
@@ -77,8 +75,6 @@ export async function updatePasswordAction(formData: FormData) {
     const currentPassword = formData.get('currentPassword') as string;
     const newPassword = formData.get('newPassword') as string;
 
-    // Note: Backend doesn't validate current password in the update profile endpoint
-    // It just updates the password field. Consider adding current password validation.
     const updateData = {
         password: newPassword,
     };

@@ -4,8 +4,6 @@ import { AuthResponse } from '@/types';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-// For server-side actions, use INTERNAL_API_URL (Docker network) if available
-// Otherwise fall back to NEXT_PUBLIC_API_URL
 const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export async function loginAction(formData: FormData) {
@@ -25,27 +23,23 @@ export async function loginAction(formData: FormData) {
             return { success: false, message: data.message || 'Login failed' };
         }
 
-        // Set cookies received from backend in the browser
-        // The backend sends tokens in the response body, we set them as cookies here
         if (data.accessToken && data.refreshToken) {
             const cookieStore = await cookies();
 
-            // Set accessToken cookie
             cookieStore.set('accessToken', data.accessToken, {
                 httpOnly: true,
-                secure: false, // Set to true for HTTPS
+                secure: false,
                 sameSite: 'lax',
                 path: '/',
-                maxAge: 24 * 60 * 60, // 1 day
+                maxAge: 24 * 60 * 60,
             });
 
-            // Set refreshToken cookie
             cookieStore.set('refreshToken', data.refreshToken, {
                 httpOnly: true,
-                secure: false, // Set to true for HTTPS
+                secure: false,
                 sameSite: 'lax',
                 path: '/',
-                maxAge: 7 * 24 * 60 * 60, // 7 days
+                maxAge: 7 * 24 * 60 * 60,
             });
         }
 
@@ -73,6 +67,20 @@ export async function signupAction(formData: FormData) {
 
         if (!res.ok) {
             return { success: false, message: data.message || 'Signup failed' };
+        }
+
+        if (data.userId && data.email) {
+            const cookieStore = await cookies();
+
+            const verificationToken = Buffer.from(`${data.userId}:${data.email}:${Date.now()}`).toString('base64');
+
+            cookieStore.set('otpVerificationToken', verificationToken, {
+                httpOnly: true,
+                secure: false,
+                sameSite: 'lax',
+                path: '/',
+                maxAge: 10 * 60,
+            });
         }
 
         return {
@@ -108,18 +116,24 @@ export async function verifyOtpAction(
 
         if (data.accessToken && data.refreshToken) {
             const cookieStore = await cookies();
+
             cookieStore.set('accessToken', data.accessToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 15 * 60,
+                secure: false,
+                sameSite: 'lax',
+                path: '/',
+                maxAge: 24 * 60 * 60,
             });
+
             cookieStore.set('refreshToken', data.refreshToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
+                secure: false,
+                sameSite: 'lax',
+                path: '/',
                 maxAge: 7 * 24 * 60 * 60,
             });
+
+            cookieStore.delete('otpVerificationToken');
         }
 
         return { success: true, message: data.message, user: data.user };

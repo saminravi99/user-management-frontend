@@ -82,7 +82,11 @@ export function VerifyOtpForm({ userId, email }: VerifyOtpFormProps) {
           </p>
         </div>
 
-        <Button type="submit" className="w-full" disabled={isPending}>
+        <Button
+          type="submit"
+          className="w-full cursor-pointer transition-all duration-200 hover:shadow-lg"
+          disabled={isPending}
+        >
           {isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -101,7 +105,7 @@ export function VerifyOtpForm({ userId, email }: VerifyOtpFormProps) {
             type="button"
             onClick={handleResendOtp}
             disabled={isResending}
-            className="font-medium text-primary hover:underline disabled:opacity-50"
+            className="cursor-pointer font-semibold text-indigo-600 transition-colors duration-200 hover:text-purple-600 hover:underline disabled:opacity-50"
           >
             {isResending ? 'Resending...' : 'Resend Code'}
           </button>

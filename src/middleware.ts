@@ -1,40 +1,89 @@
+import { jwtDecode } from 'jwt-decode';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+interface JWTPayload {
+    userId: string;
+    email: string;
+    role: 'user' | 'admin' | 'superadmin';
+    iat: number;
+    exp: number;
+}
 
-const publicPaths = ['/login', '/signup', '/verify-otp'];
-const authPaths = ['/login', '/signup'];
+const publicPaths = ['/'];
+
+const authOnlyPaths = ['/login', '/signup'];
+
+const protectedPaths = ['/dashboard'];
+
+const adminPaths = ['/dashboard/admin'];
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    // Get tokens from cookies
     const accessToken = request.cookies.get('accessToken')?.value;
     const refreshToken = request.cookies.get('refreshToken')?.value;
     const hasAuth = !!(accessToken || refreshToken);
 
-    // Redirect root to login
+    const otpVerificationToken = request.cookies.get('otpVerificationToken')?.value;
+
+    let userRole: string | null = null;
+    if (accessToken) {
+        try {
+            const decoded = jwtDecode<JWTPayload>(accessToken);
+            userRole = decoded.role;
+        } catch (error) {
+            console.error('Failed to decode JWT:', error);
+        }
+    }
+
     if (pathname === '/') {
+        if (hasAuth) {
+            return NextResponse.redirect(new URL('/dashboard', request.url));
+        }
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    // Allow public paths
-    if (publicPaths.includes(pathname)) {
-        // If already authenticated and trying to access auth pages, redirect to dashboard
-        if (hasAuth && authPaths.includes(pathname)) {
+    if (authOnlyPaths.some((path) => pathname.startsWith(path))) {
+        if (hasAuth) {
             return NextResponse.redirect(new URL('/dashboard', request.url));
         }
         return NextResponse.next();
     }
 
-    // Protect dashboard routes
-    if (pathname.startsWith('/dashboard')) {
+    if (pathname.startsWith('/verify-otp')) {
+
+        if (!otpVerificationToken) {
+            return NextResponse.redirect(new URL('/signup', request.url));
+        }
+
+        if (hasAuth) {
+            return NextResponse.redirect(new URL('/dashboard', request.url));
+        }
+
+        return NextResponse.next();
+    }
+
+    if (adminPaths.some((path) => pathname.startsWith(path))) {
         if (!hasAuth) {
             const loginUrl = new URL('/login', request.url);
             loginUrl.searchParams.set('redirect', pathname);
             return NextResponse.redirect(loginUrl);
         }
 
-        // Let the page component handle authorization and user fetching
+        if (userRole !== 'admin' && userRole !== 'superadmin') {
+            return NextResponse.redirect(new URL('/dashboard', request.url));
+        }
+
+        return NextResponse.next();
+    }
+
+    if (protectedPaths.some((path) => pathname.startsWith(path))) {
+        if (!hasAuth) {
+            const loginUrl = new URL('/login', request.url);
+            loginUrl.searchParams.set('redirect', pathname);
+            return NextResponse.redirect(loginUrl);
+        }
+
         return NextResponse.next();
     }
 

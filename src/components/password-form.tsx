@@ -22,7 +22,6 @@ export function PasswordForm() {
           description: result.message || 'Password updated successfully!',
         });
 
-        // Reset form
         const form = document.querySelector('form') as HTMLFormElement;
         form?.reset();
       } else {

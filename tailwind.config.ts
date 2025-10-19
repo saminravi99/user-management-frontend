@@ -49,6 +49,19 @@ const config: Config = {
                 md: 'calc(var(--radius) - 2px)',
                 sm: 'calc(var(--radius) - 4px)',
             },
+            keyframes: {
+                'pulse-slow': {
+                    '0%, 100%': { opacity: '0.3' },
+                    '50%': { opacity: '0.5' },
+                },
+            },
+            animation: {
+                'pulse-slow': 'pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            },
+            animationDelay: {
+                '2000': '2s',
+                '4000': '4s',
+            },
         },
     },
     plugins: [require('tailwindcss-animate')],

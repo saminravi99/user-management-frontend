@@ -37,31 +37,40 @@ export function ProfileForm({ user }: ProfileFormProps) {
   }
 
   return (
-    <form action={handleSubmit} className="space-y-4">
+    <form action={handleSubmit} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="name">Full Name</Label>
+        <Label htmlFor="name" className="text-sm font-bold text-gray-700">
+          Full Name
+        </Label>
         <Input id="name" name="name" type="text" defaultValue={user.name} disabled={isPending} />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="contactNumber">Contact Number</Label>
+        <Label htmlFor="contactNumber" className="text-sm font-bold text-gray-700">
+          Contact Number
+        </Label>
         <Input
           id="contactNumber"
           name="contactNumber"
           type="tel"
           defaultValue={user.contactNumber}
+          placeholder="+1234567890"
           disabled={isPending}
         />
       </div>
 
-      <Button type="submit" disabled={isPending}>
+      <Button
+        type="submit"
+        disabled={isPending}
+        className="h-12 w-full cursor-pointer bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 text-base font-bold shadow-lg shadow-indigo-500/50 transition-all duration-200 hover:scale-[1.02] hover:shadow-xl hover:shadow-indigo-500/60 sm:w-auto sm:px-8"
+      >
         {isPending ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
             Updating...
           </>
         ) : (
-          'Update Profile'
+          'Update Profile →'
         )}
       </Button>
     </form>
