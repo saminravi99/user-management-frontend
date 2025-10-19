@@ -1,0 +1,30 @@
+# Node modules
+node_modules
+npm-debug.log
+
+# Next.js
+.next
+out
+
+# Environment files
+.env*.local
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Misc
+*.md
+!README.md
+.eslintrc.json
+.prettierrc
